@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mdq.yyjhservice.dao.auth.TRolePermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.mdq.yyjhservice.domain.auth.TRolePermission" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="permission_id" property="permissionId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, role_id, permission_id
+  </sql>
+
+  <insert id="insert" parameterType="com.mdq.yyjhservice.domain.auth.TRolePermission" >
+    insert into t_role_permission (id, role_id, permission_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER}, #{permissionId,jdbcType=INTEGER}
+      )
+  </insert>
+  <!--根据permission_id,role_ids添加多行-->
+  <insert id="insertSomeByPidRids" parameterType="java.util.Map">
+    insert into
+      t_role_permission(role_id,permission_id)
+    values
+      <foreach collection="role_ids" item="item" separator=",">
+        (#{item},#{permission_id})
+      </foreach>
+  </insert>
+  <!--根据role_id,permission添加一条数据-->
+  <insert id="insertOneByRP">
+    insert into
+      t_role_permission(role_id,permission_id)
+    values(#{role_id},(
+      select
+        id
+      from
+        t_permission
+      where
+        permission = #{permission}
+    ))
+  </insert>
+  <!--根据role_id获取sum-->
+  <select id="getSumByRoleId" resultType="java.lang.Integer">
+    select
+      sum(1)
+    from
+      t_role_permission
+    where
+      role_id = #{role_id}
+  </select>
+  <!--分页查询-->
+  <select id="selectPermIdsByLimit" resultType="java.lang.Integer">
+    select
+      permission_id
+    from
+      t_role_permission
+    where
+      role_id = #{role_id}
+    limit #{begin},#{pageSize}
+  </select>
+  <!--根据permission_id搜索-->
+  <select id="selectByPermissionId" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"></include>
+    from
+      t_role_permission
+    where
+      permission_id = #{permission_id}
+  </select>
+  <!--根据loginid获取账号权限信息-->
+  <select id="selectPermission_idByRole_id" parameterType="java.util.List" resultType="java.lang.Integer">
+      select
+        distinct permission_id
+      from
+        t_role_permission
+      where
+      <choose>
+        <when test="roles != null and roles.size != 0 ">
+            role_id in (
+              <foreach collection="roles" item="item" separator="," >
+                  #{item}
+              </foreach>
+            )
+        </when>
+        <otherwise>
+            1=0
+        </otherwise>
+      </choose>
+  </select>
+  <!--根据role_id获取permission_ids-->
+  <select id="selectPermIdsByRoleId" resultType="java.lang.Integer">
+    select
+      permission_id
+    from
+      t_role_permission
+    where
+      role_id = #{role_id}
+  </select>
+  <!--搜索整张带rolename的t_role_permission表-->
+  <select id="selectMyAll" resultType="com.mdq.yyjhservice.pojo.MyTRolePermission">
+    select
+      tr.id, role_id roleId, permission_id permissionId,roleName
+    from
+      t_role_permission trp left join t_role tr on trp.role_id = tr.id
+  </select>
+  <!--根据perm_ids获取MyTRolePermission-->
+  <select id="selectRolesByPermIds" parameterType="java.util.List" resultType="com.mdq.yyjhservice.pojo.MyTRolePermission">
+    select
+      tr.id, role_id roleId, permission_id permissionId,roleName
+    from
+      t_role_permission trp left join t_role tr on trp.role_id = tr.id
+    where
+    <choose>
+      <when test="permIds != null and permIds.size>0">
+         tr.id in
+        <foreach collection="permIds" item="item" separator="," open="(" close=")">
+          #{item}
+        </foreach>
+      </when>
+      <otherwise>
+        1=0
+      </otherwise>
+    </choose>
+  </select>
+  <!--查询映射是否存在
+  根据role_id,permission查询-->
+  <select id="selectOneByRP" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"></include>
+    from
+      t_role_permission
+    where
+      role_id = #{role_id} and permission_id = (
+        select distinct
+          id
+        from
+          t_permission
+        where
+          permission = #{permission}
+      )
+  </select>
+  <!--根据permission_id删除-->
+  <delete id="deleteByPermissionId">
+    delete from
+      t_role_permission
+    where
+      permission_id = #{permission_id}
+  </delete>
+  <!--根据role_id,permission_id删除一行-->
+  <delete id="deleteOneByRolePermission">
+    delete from
+      t_role_permission
+    where
+      role_id = #{role_id} and permission_id = #{permission_id}
+  </delete>
+  <!--根据permission_ids删除多行-->
+  <delete id="deleteSomeByPRId" parameterType="java.util.List">
+    delete from
+      t_role_permission
+    where
+      role_id = #{role_id} and
+      <choose>
+        <when test="permission_ids != null and permission_ids.size>0">
+          permission_id in
+          <foreach collection="permission_ids" separator="," item="item" open="(" close=")">
+            #{item}
+          </foreach>
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+  </delete>
+</mapper>

@@ -1,0 +1,76 @@
+.input-group{
+    width:50%;
+    margin:0 auto;
+    margin-bottom:20px;
+}
+.mine-addon{
+    width:80px;
+    /*左右对齐*/
+    text-align-last:justify;
+}
+.mine-panel-title{
+    text-shadow: 3px 3px 5px black;
+    font-size:20px;
+    letter-spacing:10px;
+    color:#5F9EA0;
+    font-weight:bold;
+}
+/*验证码*/
+.mine-canvas-code{
+    background:grey;
+    width:35%;
+    height:34px;
+    margin:0;
+    padding:0;
+}
+.mine-text-code{
+    width:50%;
+    height:34px;
+    margin-left:4%;
+    margin-right: 1%;
+    letter-spacing: 10px;
+    text-indent: 5px;
+    text-align:center;
+    font-weight:bold;
+    text-shadow: 2px 3px 3px grey;
+    font-size:17px;
+}
+.mine-badge-span{
+    width:10%;
+}
+/*form表单按钮组样式*/
+.mine-btn-group{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+/*form表单的按钮样式*/
+input[type="reset"], input[type="submit"]{
+    width:50%;
+    letter-spacing: 10px;
+}
+/**
+ * registe
+ */
+.r_headimg_container{
+    width:70px;
+    height:70px;
+    border:4px double lightgray;
+    border-radius:5px;
+    box-shadow: 2px 2px 3px grey;
+    margin:0 auto;
+    display:flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    font-size:25px;
+    color:lightblue;
+}
+.r_headimg_container:hover,.l_headimg_container:hover{
+    color:skyblue;
+}
+.registe_headimg_img{
+    width:70px;
+    height:70px;
+    display:none;
+}

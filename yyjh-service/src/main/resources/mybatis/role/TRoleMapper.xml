@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mdq.yyjhservice.dao.auth.TRoleMapper" >
+  <resultMap id="BaseResultMap" type="com.mdq.yyjhservice.domain.auth.TRole" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="rolename" property="rolename" jdbcType="VARCHAR" />
+    <result column="roledesc" property="roledesc" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, rolename, roledesc, create_time, update_time, remark, state
+  </sql>
+  <insert id="insert" parameterType="com.mdq.yyjhservice.domain.auth.TRole" >
+    insert into t_role (id, rolename, roledesc,
+      create_time, update_time, remark,
+      state)
+    values (#{id,jdbcType=INTEGER}, #{rolename,jdbcType=VARCHAR}, #{roledesc,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},
+      #{state,jdbcType=CHAR})
+  </insert>
+
+    <!--搜索整张表sum-->
+    <select id="getSum" resultType="java.lang.Integer">
+    select
+      sum(1)
+    from
+      t_role
+  </select>
+  <!--查询整张表-->
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"></include>
+        from
+          t_role
+    </select>
+    <!--分页查询-->
+    <select id="selectLimit" resultMap="BaseResultMap">
+        <if test="text != null and text != ''">
+            <bind name="searchText" value="'%'+text+'%'"></bind>
+        </if>
+        select
+        <include refid="Base_Column_List"></include>
+        from
+        t_role
+        <if test="text != null and text != ''">
+            where
+                rolename like #{searchText} or roledesc like #{searchText}
+        </if>
+        limit #{begin},#{pageSize}
+    </select>
+  <!--根据loginId获取用户所有角色-->
+  <select id="selectRolenamesByLoginid" resultMap="BaseResultMap">
+    SELECT
+        <include refid="Base_Column_List"></include>
+    FROM
+        t_role
+    WHERE
+        id in (
+            SELECT
+                distinct role_id
+            from
+                t_user_role
+            WHERE
+                user_id = (
+                    SELECT
+                        DISTINCT id
+                    from
+                        t_user
+                    where
+                        loginId = #{loginId}
+                )
+        )
+  </select>
+    <!--根据id修改state-->
+    <update id="updateStateById">
+    update
+      t_role
+    set
+      state = #{state}
+    where
+      id = #{id}
+  </update>
+    <!--根据id删除一行-->
+    <delete id="deleteOneById">
+        delete from
+          t_role
+        where
+          id = #{id}
+    </delete>
+    <!--根据ids删除多行-->
+    <delete id="deleteSomeByIds" parameterType="java.util.List">
+        delete from
+          t_role
+        where
+          <choose>
+              <when test="ids != null and ids.size>0">
+                  id in
+                  <foreach collection="ids" item="item" separator="," open="(" close=")">
+                      #{item}
+                  </foreach>
+              </when>
+              <otherwise>
+                  1 = 0
+              </otherwise>
+          </choose>
+    </delete>
+</mapper>

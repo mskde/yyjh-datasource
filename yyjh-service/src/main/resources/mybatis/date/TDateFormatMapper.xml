@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mdq.yyjhservice.dao.date.TDateFormatMapper" >
+  <resultMap id="BaseResultMap" type="com.mdq.yyjhservice.domain.date.TDateFormat" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="date_flag" property="dateFlag" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, date_flag
+  </sql>
+  <select id="getTDateFormatById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_date_format
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+
+  <insert id="addTDateFormat" parameterType="com.mdq.yyjhservice.domain.date.TDateFormat" >
+    insert into t_date_format
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="dateFlag != null" >
+        date_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="dateFlag != null" >
+        #{dateFlag,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updTDateFormatById" parameterType="com.mdq.yyjhservice.domain.date.TDateFormat" >
+    update t_date_format
+    <set >
+      <if test="dateFlag != null" >
+        date_flag = #{dateFlag,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <delete id="delTDateFormatById" parameterType="java.lang.Integer" >
+    delete from t_date_format
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+</mapper>

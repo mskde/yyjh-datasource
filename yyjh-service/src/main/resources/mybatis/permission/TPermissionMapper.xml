@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mdq.yyjhservice.dao.auth.TPermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.mdq.yyjhservice.domain.auth.TPermission" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="permission" property="permission" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, permission, state, create_time, update_time
+  </sql>
+  <insert id="insert" parameterType="com.mdq.yyjhservice.domain.auth.TPermission" >
+    insert into t_permission (id, permission, state, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{permission,jdbcType=VARCHAR}, #{state,jdbcType=CHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+    <!--搜索整张表sum-->
+    <select id="getSum" resultType="java.lang.Integer">
+    select
+      sum(1)
+    from
+      t_permission
+  </select>
+    <!--查询整张表-->
+    <select id="selectAll" resultMap="BaseResultMap">
+      select
+        <include refid="Base_Column_List"></include>
+      from
+        t_permission
+    </select>
+    <!--分页查询-->
+    <select id="selectLimit" resultMap="BaseResultMap">
+        <if test="text != null and text != ''">
+            <bind name="searchText" value="'%'+text+'%'"></bind>
+        </if>
+        select
+        <include refid="Base_Column_List"></include>
+        from
+        t_permission
+        <if test="text != null and text != ''">
+            where
+              permission like #{searchText}
+        </if>
+        limit #{begin},#{pageSize}
+    </select>
+  <!--根据roleid获取权限所有信息-->
+  <select id="selectAllByRoleid" resultMap="BaseResultMap">
+    SELECT
+        <include refid="Base_Column_List"></include>
+    from
+        t_permission
+    where
+        id in(
+            SELECT
+                permission_id
+            from
+                t_role_permission
+            WHERE
+                role_id = #{role_id}
+        )
+  </select>
+    <!--根据id获取多行-->
+    <select id="selectAllByIdsText" parameterType="java.util.Map" resultMap="BaseResultMap">
+        <if test="text != null and text != ''">
+            <bind name="searchText" value="'%'+text+'%'"></bind>
+        </if>
+        select
+          <include refid="Base_Column_List"></include>
+        from
+          t_permission
+        where
+        <choose>
+            <when test="ids != null and ids.size>0">
+                id in
+                  <foreach collection="ids" item="item" separator="," open="(" close=")">
+                      #{item}
+                  </foreach>
+                <if test="text != null and text != ''">
+                    and permission like #{searchText}
+                </if>
+            </when>
+            <otherwise>
+                1 = 0
+            </otherwise>
+        </choose>
+
+    </select>
+    <!--根据role_id获取permissions-->
+    <select id="selectPermissionsByRoleId" resultType="java.lang.String">
+        select
+          permission
+        from
+          t_role_permission trp left join t_permission tp on trp.permission_id = tp.id
+        where
+          role_id = #{role_id}
+    </select>
+    <!--根据id修改state-->
+    <update id="updateStateById">
+    update
+      t_permission
+    set
+      state = #{state}
+    where
+      id = #{id}
+  </update>
+    <!--根据id删除一行-->
+    <delete id="deleteOneById">
+        delete from
+          t_permission
+        where
+          id = #{id}
+    </delete>
+    <!--根据ids删除多行-->
+    <delete id="deleteSomeByIds" parameterType="java.util.List">
+        delete from
+          t_permission
+        where
+          <choose>
+              <when test="ids != null and ids.size>0">
+                 id in
+                  <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                  </foreach>
+              </when>
+              <otherwise>
+                  1 = 0
+              </otherwise>
+        </choose>
+    </delete>
+</mapper>

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mdq.yyjhservice.dao.user.TUserMapper" >
+  <resultMap id="BaseResultMap" type="com.mdq.yyjhservice.domain.user.TUser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="loginId" property="loginid" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="nickname" property="nickname" jdbcType="VARCHAR" />
+    <result column="userimg" property="userimg" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, loginId, password, nickname, userimg, email, tel, create_time, update_time, remark, state
+  </sql>
+  <insert id="insert" parameterType="com.mdq.yyjhservice.domain.user.TUser" >
+    insert into t_user (loginId, password,
+      nickname, userimg, email, 
+      tel, create_time, update_time, 
+      remark, state)
+    values (
+      #{loginid,jdbcType=VARCHAR}
+      , #{password,jdbcType=VARCHAR}
+      , #{nickname,jdbcType=VARCHAR}
+      , #{userimg,jdbcType=VARCHAR}
+      , #{email,jdbcType=VARCHAR}
+      , #{tel,jdbcType=VARCHAR}
+      <choose>
+        <when test="createTime = null || createTime = '' ">
+          ,now()
+        </when>
+        <otherwise>
+          ,#{createTime,jdbcType=TIMESTAMP}
+        </otherwise>
+      </choose>
+    <choose>
+      <when test="updateTime = null || updateTime = '' ">
+        ,now()
+      </when>
+      <otherwise>
+        ,#{updateTime,jdbcType=TIMESTAMP}
+      </otherwise>
+    </choose>
+      ,#{remark,jdbcType=VARCHAR}
+    <choose>
+      <when test="state = null || state = '' ">
+        ,1
+      </when>
+      <otherwise>
+        ,#{state,jdbcType=CHAR}
+      </otherwise>
+    </choose>
+    )
+  </insert>
+  <update id="createTable">
+    create  table  if not exists T(
+      id int primary  key auto_increment,
+      name varchar(50) not null,
+      psw double DEFAULT 5
+    )
+  </update>
+  <!--搜索整张表sum-->
+  <select id="getSum" resultType="java.lang.Integer">
+    select
+      sum(1)
+    from
+      t_user
+  </select>
+  <!--查询整张表-->
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"></include>
+    from
+      t_user
+  </select>
+  <!--分页查询-->
+  <select id="selectLimit" resultMap="BaseResultMap">
+    <if test="text != null and text != ''">
+      <bind name="searchText" value="'%'+text+'%'"></bind>
+    </if>
+    select
+      <include refid="Base_Column_List"></include>
+    from
+      t_user
+    <if test="text != null and text != ''">
+      where
+        loginId like #{searchText} or nickname like #{searchText}
+    </if>
+    limit #{begin},#{pageSize}
+  </select>
+  <!--根据账号获取loginId(账号可能是loginId,邮箱，手机号)-->
+  <select id="selectLoginIdByUser" resultType="java.lang.String">
+    select
+      distinct loginId
+    from
+      t_user
+    where
+      (loginId = #{value} or email = #{value} or tel = #{value}) and state = 1
+  </select>
+  <!--根据账号获取用户所有信息-->
+  <select id="selectAllByUser" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"></include>
+    from
+      t_user
+    where
+      (loginId = #{loginId} or email = #{loginId} or tel = #{loginId}) and state = 1
+  </select>
+  <!--根据账号获取id-->
+  <select id="getUseridByLoginid" resultType="java.lang.String">
+    select
+      distinct id
+    from
+      t_user
+    where
+      loginId = #{loginId} and state = 1
+  </select>
+  <!--根据账号获取密码-->
+  <select id="getPwdByLoginid" resultType="java.lang.String">
+    select
+      distinct password
+    from
+      t_user
+    where
+      (loginId = #{loginId} or email = #{loginId} or tel = #{loginId}) and state = 1
+  </select>
+  <!--根据账号获取邮箱-->
+  <select id="getEmailByLoginid" resultType="java.lang.String">
+    select
+      distinct email
+    from
+      t_user
+    where
+      loginId = #{loginId} and state = 1
+  </select>
+  <!--根据账号获取头像地址-->
+  <select id="getUserimgByLoginid" resultType="java.lang.String">
+    select
+      distinct userimg
+    from
+      t_user
+    where
+      loginId = #{loginId} and state = 1
+  </select>
+  <!--根据账号获取邮箱,密码-->
+  <select id="getEmail_and_PasswordByLoginid" resultType="java.util.Map">
+    select
+      distinct email,password
+    from
+      t_user
+    where
+      loginId = #{loginId} and state = 1
+  </select>
+ <!--（注册）查询账号是否已存在-->
+  <select id="isLoginIdRepeat" resultType="java.lang.Integer">
+    select
+      count(1)
+    from
+      t_user
+    where
+      (loginId = #{loginId} or email = #{loginId} or tel = #{loginId}) and state = 1
+  </select>
+  <!--（注册）邮箱是否已存在-->
+  <select id="isEmailRepeat" resultType="java.lang.Integer">
+    select
+      count(1)
+    from
+      t_user
+    where
+      email = #{email} and state = 1
+  </select>
+  <!--（注册）手机号是否已存在-->
+  <select id="isTelRepeat" resultType="java.lang.Integer">
+    select
+      count(1)
+    from
+      t_user
+    where
+      tel = #{tel} and state = 1
+  </select>
+  <!--根据ids获取用户数据-->
+  <select id="getUsersByIdsText" parameterType="java.util.Map" resultMap="BaseResultMap">
+    <if test="text != null and text != ''">
+      <bind name="searchText" value="'%'+text+'%'"></bind>
+    </if>
+    select
+      <include refid="Base_Column_List"></include>
+    from
+      t_user
+    where
+      <choose>
+        <when test = "ids != null and ids.size > 0">
+          id in
+          <foreach collection="ids" separator="," close=")" open="(" item="item">
+            #{item}
+          </foreach>
+          <if test="text != null and text != ''">
+            and loginId like #{searchText} or nickname like #{searchText}
+          </if>
+        </when>
+        <otherwise>
+          1=0
+        </otherwise>
+      </choose>
+  </select>
+  <!--修改密码-->
+  <update id="updatePasswordByLoginid" parameterType="java.lang.String">
+    update
+      t_user
+    set
+       password = #{password}
+      ,update_time = now()
+    where
+      loginId = #{loginId} and state = 1
+  </update>
+  <!--根据loginId删除一行-->
+  <delete id="deleteOneById">
+    delete from
+      t_user
+    where
+      id = #{id}
+  </delete>
+  <!--根据loginId删除一行-->
+  <delete id="deleteOneByLoginid" parameterType="java.lang.String">
+    delete from
+      t_user
+    where
+      loginId = #{loginId}
+  </delete>
+  <!--根据ids删除多行-->
+  <delete id="deleteSomeByIds" parameterType="java.util.List">
+    delete from
+      t_user
+    where
+      <choose>
+        <when test="ids != null and ids.size > 0">
+          id in (
+          <foreach collection="ids" item="item" separator=",">
+            #{item}
+          </foreach>
+          )
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+  </delete>
+  <!--根据loginIds删除多行-->
+  <delete id="deleteSomeByLoginid" parameterType="java.lang.String">
+    delete from
+      t_user
+    where
+      <choose>
+        <when test="loginIds != null and loginIds.length > 0">
+          loginId in (
+            <foreach collection="loginIds" item="item" separator=",">
+              #{item}
+            </foreach>
+          )
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+  </delete>
+  <!--根据loginid修改昵称-->
+  <update id="updateInfoByLoginId">
+    update
+      t_user
+    set
+      <choose>
+        <when test="infoname == 'loginId'">
+          loginId = #{value}
+        </when>
+        <when test="infoname == 'password'">
+          password = #{value}
+        </when>
+        <when test="infoname == 'nickname'">
+          nickname = #{value}
+        </when>
+        <when test="infoname == 'userimg'">
+          userimg = #{value}
+        </when>
+        <when test="infoname == 'email'">
+          email = #{value}
+        </when>
+        <when test="infoname == 'tel'">
+          tel = #{value}
+        </when>
+        <when test="infoname == 'remark'">
+          remark = #{value}
+        </when>
+        <otherwise>
+          /*出错处理，有问题*/
+          update_time = now()
+        </otherwise>
+      </choose>
+     ,update_time = now()
+    where
+      loginId = #{loginid}
+  </update>
+  <!--根据id修改state-->
+  <update id="updateStateById">
+    update
+      t_user
+    set
+      state = #{state}
+    where
+      id = #{id}
+  </update>
+</mapper>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mdq.yyjhservice.dao.auth.TUserRroleMapper" >
+  <resultMap id="BaseResultMap" type="com.mdq.yyjhservice.domain.auth.TUserRrole" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, role_id, user_id
+  </sql>
+  <insert id="insert" parameterType="com.mdq.yyjhservice.domain.auth.TUserRrole" >
+    insert into t_user_role (id, role_id, user_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}
+      )
+  </insert>
+  <!--根据role_id获取sum-->
+  <select id="getSumByRoleId" resultType="java.lang.Integer">
+    select
+      sum(1)
+    from
+      t_user_role
+    where
+      role_id = #{role_id}
+  </select>
+  <!--分页查询-->
+  <select id="selectUserIdByLimit" resultType="java.lang.Integer">
+    select
+      user_id
+    from
+      t_user_role
+    where
+      role_id = #{role_id}
+    limit #{begin},#{pageSize}
+  </select>
+  <!--根据loginid获取用户角色信息-->
+  <select id="selectRolesByLoginid" resultType="java.lang.Integer">
+    select
+      role_id
+    from
+      t_user_role
+    where
+      user_id = (
+        select
+          distinct id
+        from
+          t_user
+        where
+          loginId = #{loginid}
+      )
+  </select>
+  <!--根据role_id获取用户信息-->
+  <select id="selectUserIdByRoleId" resultType="java.lang.Integer">
+    select
+      user_id
+    from
+      t_user_role
+    where
+      role_id = #{role_id}
+  </select>
+  <!--根据loginid获取用户角色信息-->
+  <select id="selectRolesByUserId" resultType="java.lang.Integer">
+    select
+      role_id
+    from
+      t_user_role
+    where
+      user_id = #{userId}
+  </select>
+  <!--获取整张表（返回MyTUserRole）-->
+  <select id="selectMyAll" resultType="com.mdq.yyjhservice.pojo.MyTUserRole">
+    select
+      tur.id,rolename roleName,role_id roleId,user_id userId
+    from
+      t_user_role tur left join t_role tr on tur.role_id = tr.id
+  </select>
+  <!--根据user_ids获取整行（返回MyTUserRole）-->
+  <select id="selectMyAllByUserIds" parameterType="java.util.List" resultType="com.mdq.yyjhservice.pojo.MyTUserRole">
+    select
+      tur.id,rolename roleName,role_id roleId,user_id userId
+    from
+      t_user_role tur left join t_role tr on tur.role_id = tr.id
+    where
+      <choose>
+        <when test="user_ids != null and user_ids.size > 0">
+          user_id in
+          <foreach collection="user_ids" item="item" open="(" close=")" separator=",">
+            #{item}
+          </foreach>
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+  </select>
+  <!--根据user_ids删除-->
+  <delete id="deleteSomeByUserId" parameterType="java.util.Map">
+    delete from
+      t_user_role
+    where
+      user_id = #{userId} and
+      <choose>
+        <when test="role_ids != null and role_ids.size > 0">
+          role_id in (
+            <foreach collection="role_ids" separator="," item="item">
+              #{item}
+            </foreach>
+          )
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+  </delete>
+  <!--根据user_id,role_id删除一行-->
+  <delete id="deleteOneByRoleUser">
+    delete from
+      t_user_role
+    where
+      role_id = #{role_id} and user_id = #{user_id}
+  </delete>
+  <!--根据user_id删除多行-->
+  <delete id="deleteAllByUserId">
+    delete from
+      t_user_role
+    where
+      user_id = #{user_id}
+  </delete>
+  <!--根据loginid删除多行-->
+  <delete id="deleteAllByLoginId">
+    delete from
+      t_user_role
+    where
+      user_id in (
+        select
+          id
+        from
+          t_user
+        where
+          loginId = #{loginId}
+      )
+  </delete>
+  <!--根据user_ids删除多行-->
+  <delete id="deleteSomeByURId" parameterType="java.util.List">
+    delete from
+      t_user_role
+    where
+      role_id = #{role_id} and
+      <choose>
+        <when test="user_ids != null and user_ids.size>0">
+          user_id in
+          <foreach collection="user_ids" item="item" open="(" close=")" separator=",">
+            #{item}
+          </foreach>
+        </when>
+        <otherwise>
+          1 = 0
+        </otherwise>
+      </choose>
+  </delete>
+  <!--根据user_ids插入-->
+  <insert id="insertSomeByUserId" parameterType="java.util.Map">
+    <choose>
+      <when test="role_ids != null and role_ids.size > 0">
+        insert into
+          t_user_role(role_id,user_id)
+        values
+        <foreach collection="role_ids" separator="," item="item">
+          (#{item},#{userId})
+        </foreach>
+      </when>
+      <otherwise>
+
+      </otherwise>
+    </choose>
+  </insert>
+</mapper>

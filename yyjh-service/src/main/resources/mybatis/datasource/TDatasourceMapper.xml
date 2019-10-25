@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mdq.yyjhservice.dao.datasource.TDatasourceMapper" >
+  <resultMap id="BaseResultMap" type="com.mdq.yyjhservice.domain.datasource.TDatasource" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" />
+    <result column="database_name" property="databaseName" jdbcType="VARCHAR" />
+    <result column="alias" property="alias" jdbcType="VARCHAR" />
+    <result column="driver" property="driver" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="INTEGER" />
+    <result column="auth" property="auth" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="encode" property="encode" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, user_id, type, createtime, updatetime, database_name, alias, driver, url, port,
+    auth, username, password, description, encode
+  </sql>
+  <delete id="delTDatasourceById" parameterType="java.lang.Integer" >
+    delete from t_datasource
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="addTDatasource" parameterType="com.mdq.yyjhservice.domain.datasource.TDatasource" >
+    insert into t_datasource (id, user_id, type,
+      createtime, updatetime, database_name,
+      alias, driver, url,
+      port, auth, username,
+      password, description, encode
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR},
+      #{createtime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP}, #{databaseName,jdbcType=VARCHAR},
+      #{alias,jdbcType=VARCHAR}, #{driver,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR},
+      #{port,jdbcType=INTEGER}, #{auth,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
+      #{password,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{encode}
+      )
+  </insert>
+
+  <update id="updTDatasourceById" parameterType="com.mdq.yyjhservice.domain.datasource.TDatasource" >
+    update t_datasource
+    <set>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null" >
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="databaseName != null" >
+        database_name = #{databaseName,jdbcType=VARCHAR},
+      </if>
+      <if test="alias != null" >
+        alias = #{alias,jdbcType=VARCHAR},
+      </if>
+      <if test="driver != null" >
+        driver = #{driver,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        port = #{port,jdbcType=INTEGER},
+      </if>
+      <if test="auth != null" >
+        auth = #{auth,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="encode != null" >
+        encode = #{encode},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <!-- 批量删除 -->
+  <delete id="delBatchTDatasource" parameterType="int[]">
+    <!-- delete from emp where empno in(7789,7790) -->
+    delete from t_datasource where id in
+    <foreach collection="array" item="arr" index="no" open="(" separator="," close=")">
+      #{arr}
+    </foreach>
+  </delete>
+
+
+
+
+
+  <select id="getAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_datasource
+  </select>
+
+  <select id="findTDatasourceById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from t_datasource
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+
+
+
+
+  <!--数据全字段模糊查询(类型和其余字段)-->
+  <select id="getTDatasourceByAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_datasource
+    where
+    (
+    id like concat(concat("%",#{info}),"%")
+    OR user_id like concat('%',#{info},'%')
+    OR createtime like concat('%',#{info},'%')
+    OR updatetime like concat('%',#{info},'%')
+    OR database_name like concat('%',#{info},'%')
+    OR alias like concat('%',#{info},'%')
+    OR driver like concat('%',#{info},'%')
+    OR url like concat('%',#{info},'%')
+    OR port like concat('%',#{info},'%')
+    OR auth like concat('%',#{info},'%')
+    OR username like concat('%',#{info},'%')
+    OR description like concat('%',#{info},'%')
+    )and
+    type = #{selectType}
+    <if test="null != beginNumber and null != limit">
+      LIMIT #{beginNumber},#{limit}
+    </if>
+  </select>
+  <!--（数量）数据全字段模糊查询(类型和其余字段)-->
+  <select id="getCountByAll" resultType="int">
+    select
+    COUNT(1)
+    from t_datasource
+    where
+    (
+    id like concat(concat("%",#{info}),"%")
+    OR user_id like concat('%',#{info},'%')
+    OR createtime like concat('%',#{info},'%')
+    OR updatetime like concat('%',#{info},'%')
+    OR database_name like concat('%',#{info},'%')
+    OR alias like concat('%',#{info},'%')
+    OR driver like concat('%',#{info},'%')
+    OR url like concat('%',#{info},'%')
+    OR port like concat('%',#{info},'%')
+    OR auth like concat('%',#{info},'%')
+    OR username like concat('%',#{info},'%')
+    OR description like concat('%',#{info},'%')
+    )and
+    type = #{selectType}
+  </select>
+  <!--数据全字段模糊查询(类型)-->
+  <select id="getTDatasourceByType" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_datasource
+    where
+    type = #{selectType}
+    <if test="null != beginNumber and null != limit">
+      LIMIT #{beginNumber},#{limit}
+    </if>
+  </select>
+  <!--（数量）数据全字段模糊查询(类型)-->
+  <select id="getCountByType" resultType="int">
+    select
+    COUNT(1)
+    from t_datasource
+    where
+    type = #{selectType}
+  </select>
+  <!--数据全字段模糊查询(其余字段)-->
+  <select id="getTDatasourceByOtherFields" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_datasource
+    where
+    id like concat(concat("%",#{info}),"%")
+    OR user_id like concat('%',#{info},'%')
+    OR createtime like concat('%',#{info},'%')
+    OR updatetime like concat('%',#{info},'%')
+    OR database_name like concat('%',#{info},'%')
+    OR alias like concat('%',#{info},'%')
+    OR driver like concat('%',#{info},'%')
+    OR url like concat('%',#{info},'%')
+    OR port like concat('%',#{info},'%')
+    OR auth like concat('%',#{info},'%')
+    OR username like concat('%',#{info},'%')
+    OR description like concat('%',#{info},'%')
+    <if test="null != beginNumber and null != limit">
+      LIMIT #{beginNumber},#{limit}
+    </if>
+  </select>
+  <!--（数量）数据全字段模糊查询(其余字段)-->
+  <select id="getCountByOtherFields" resultType="int">
+    select
+    COUNT(1)
+    from t_datasource
+    where
+    id like concat(concat("%",#{info}),"%")
+    OR user_id like concat('%',#{info},'%')
+    OR createtime like concat('%',#{info},'%')
+    OR updatetime like concat('%',#{info},'%')
+    OR database_name like concat('%',#{info},'%')
+    OR alias like concat('%',#{info},'%')
+    OR driver like concat('%',#{info},'%')
+    OR url like concat('%',#{info},'%')
+    OR port like concat('%',#{info},'%')
+    OR auth like concat('%',#{info},'%')
+    OR username like concat('%',#{info},'%')
+    OR description like concat('%',#{info},'%')
+  </select>
+
+
+
+
+
+  <!-- 数据分页全部查询 -->
+  <select id="getAllByPage" resultMap="BaseResultMap" parameterType="java.util.Map">
+    SELECT
+    <include refid="Base_Column_List"></include>
+    FROM t_datasource
+    <if test="null != beginNumber and null != limit">
+      LIMIT #{beginNumber},#{limit}
+    </if>
+  </select>
+  <!-- 查询单表中数据总量 -->
+  <select id="getCount" resultType="int">
+  	SELECT COUNT(1) FROM t_datasource
+  </select>
+
+
+
+
+
+
+
+
+
+  <!--获取当前数据库表名-->
+  <select id="getTableNames" resultType="java.util.Map">
+    select table_name
+    from information_schema.tables
+    where table_schema='yyjh_datasource'
+  </select>
+
+  <!--动态建表-->
+  <update id="aotoCreate" statementType="STATEMENT" parameterType="java.util.List">
+    create table if not exists ${name}(
+    <foreach collection="filename" item="item" separator="," index="index">
+      ${item} varchar (1000) not null
+    </foreach>
+    )character set utf8 collate utf8_bin;
+  </update>
+  <!--动态插入数据-->
+  <insert id="findAndInsert" parameterType="java.util.List">
+    insert into ${name}(
+    <foreach collection="filename" item="key" separator="," index="index">
+      ${key}
+    </foreach>
+    )
+    values(
+    <foreach collection="coldatas" item="value" separator="," index="index">
+      '${value}'
+    </foreach>
+    )
+  </insert>
+
+  <!--本机数据库复制表格-->
+  <update id="moveTables">
+     create table if not exists ${tablename} select * from ${dbname}.${tablename}
+  </update>
+
+</mapper>

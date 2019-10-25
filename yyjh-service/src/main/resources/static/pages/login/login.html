@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>易源聚合数字平台</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../../css/login/login.css">
+		<link rel="stylesheet" href="../../css/login/registe.css">
+		<script type="text/javascript" src="../../js/jquery-2.1.1.min.js" ></script>
+		<script src="../../bootstrap/js/bootstrap.min.js"></script>
+		<script src="../../js/login/login.js"></script>
+		<script src="../../js/login/registe.js"></script>
+		<script type="text/javascript" src="../../js/login/login-function.js" ></script>
+		<script type="text/javascript" src="../../js/login/login-utils.js" ></script>
+		<script type="text/javascript" src="../../js/utils/wholeUtils.js"></script>
+		<script src="../../js/utils/md5.js"></script>
+		<script src="../../js/utils/jquery.form.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<!--导航栏-->
+			<nav class="navbar">
+				<div class="container-fluid">
+					<!--导航栏抬头-->
+					<div class="navbar-header">
+						<a href="#" class="navbar-brand mine-title">易源聚合数字平台</a>
+					</div>
+					<!--导航栏内容-->
+					<div id="navbar_content" class="collapse navbar-collapse">
+						<div class="nav navbar-nav dropdown navbar-right navbar-brand">
+							<button id="loginbtn" class="dropdown-toggle btn btn-primary mine-headbtn" data-toggle="dropdown" >
+								<span>登陆</span>
+								<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu" aria-labelledby="loginbtn" role="menu">
+								<li class="presentation">
+									<a role="menuitem" href="#" class="mine-headli">登陆</a>
+								</li>
+								<li class="presentation">
+									<a role="menuitem" href="#" class="mine-headli">注册</a>
+								</li>
+								<li class="presentation">
+									<a role="menuitem" href="#" class="mine-headli">找回密码</a>
+								</li>
+								<li class="presentation">
+									<a role="menuitem" href="#" class="mine-headli">修改密码</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</nav>
+			<!--面板-->
+			<div id="panels" class="mine_panels col-lg-8 col-lg-push-2">
+				<!--登陆-->
+				<div id="login"   	class="panel panel-primary">
+					<div class="panel-heading">
+						<span class="mine-panel-title">登陆</span>
+					</div>
+					<div class="panel-body">
+						<form id="login_form" action="/login/login_form" method="post" onsubmit="return login()">
+							<!--<div class="input-group">-->
+								<!--<div id="l_headimg_container" class="l_headimg_container">-->
+									<!--<img id="l_headimg" class="login_headimg_img" src="../../imgs/init_headimg.jpg" />-->
+								<!--</div>-->
+							<!--</div>-->
+							<div class="input-group">
+								<span class="input-group-addon">账号</span>
+								<input type="text" id="l_user" class="form-control" name="user" placeholder="用户名/邮箱" maxlength="20" />
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon">密码</span>
+								<input type="password" id="l_pwd" class="form-control" name="pwd" placeholder="您的密码" maxlength="20" />
+							</div>
+							<div class="input-group row l_code_container">
+								<canvas id="code" class="mine-canvas-code"></canvas>
+								<input id="mycode" type="text" class="mine-text-code" placeholder="请输入验证码" maxlength="4" />
+								<span class="mine-badge-span">
+									<span class="glyphicon glyphicon-minus"></span>
+								</span>
+							</div>
+							<div class="input-group mine-btn-group">
+								<input type="reset"  class="btn btn-primary" value="清空" />
+								<input type="submit" class="btn btn-primary" value="登陆" />
+							</div>
+							<div class="input-group" style="bottom:5px;">
+								<a id="getPwd_a" href="#" class="getPwd_a">找回密码</a>
+								<a id="changePwd_a" href="#" class="getPwd_a">修改密码</a>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!--注册-->
+				<div id="registe" 	class="panel panel-primary" style="display:none;">
+					<div class="panel-heading">
+						<span class="mine-panel-title">注册</span>
+					</div>
+					<div class="panel-body">
+						<form id="registe_form" action="/login/registe_form" method="post" enctype="multipart/form-data" onsubmit="return registe()">
+							<div class="input-group">
+								<div id="r_headimg_container" class="r_headimg_container">
+									<span id="r_headplus" class="glyphicon glyphicon-plus"></span>
+									<img id="r_headimg" class="registe_headimg_img" src="" />
+								</div>
+								<input type="file" id="r_headfile" name="r_headfile" accept=".jpg,.jpeg,.png,.gif,.bmp"/>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon">
+									<span>昵称</span>
+								</span>
+								<input id="r_nickname" type="text" class="form-control" name="nickname" aria-describedby="user_label" placeholder="请输入您的昵称"  maxlength="20"/>
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon">账号</span>
+								<input id="r_user" type="text" class="form-control" name="loginid" aria-describedby="user_label" placeholder="请输入您的账号"  maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon">密码</span>
+								<input id="r_pwd" type="password" class="form-control" name="password" placeholder="请输入六位以上字符" maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon">确认密码</span>
+								<input id="r_repwd" type="password" class="form-control" placeholder="请确认密码"  maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon">邮箱</span>
+								<input id="r_email" type="email" class="form-control" name="email" aria-describedby="user_label" placeholder="请输入邮箱地址"  maxlength="30" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon">电话</span>
+								<input id="r_tel" type="text" class="form-control" name="tel" aria-describedby="user_label" placeholder="请输入联系方式"  maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group row" style="display:flex;align-items:center;">
+								<canvas id="r_code" class="mine-canvas-code"></canvas>
+								<input id="r_mycode" type="text" maxlength="4" class="mine-text-code"/>
+								<span class="mine-badge-span">
+									<span class=""></span>
+								</span>
+							</div>
+							<div class="input-group mine-btn-group">
+								<input type="reset"  class="btn btn-primary" value="清空" />
+								<input type="submit" class="btn btn-primary" value="注册" />
+							</div>
+						</form>
+					</div>
+				</div>
+				<!--找回密码-->
+				<div id="getPwd"   	class="panel panel-primary" style="display:none;">
+					<div class="panel-heading">
+						<span class="mine-panel-title">找回密码</span>
+					</div>
+					<div class="panel-body">
+						<form id="getPwd_form" action="" method="get" onsubmit="return false;">
+							<div id="getPwd_container1" class="input-group mine-input-group">
+								<span id="g_label" class="input-group-addon">您的账号：</span>
+								<input type="text" id="g_value" class="form-control" name="g_value" />
+							</div>
+							<div id="getPwd_container2" class="input-group mine-input-group" style="display:none">
+								<span class="input-group-addon" style="font-size:35px;">邮件发送成功！</span>
+							</div>
+							<div class="input-group mine-btn-group">
+								<input id="getPwd_prev" type="button"  class="btn btn-primary" value="上一步" />
+								<input id="getPwd_next" type="button"  class="btn btn-primary" value="下一步" />
+							</div>
+						</form>
+					</div>
+				</div>
+				<!--修改密码-->
+				<div id="changePwd" class="panel panel-primary" style="display:none;">
+					<div class="panel-heading">
+						<span class="mine-panel-title">修改密码</span>
+					</div>
+					<div class="panel-body">
+						<form id="changePwd_form" action="/login/changePwd_form" method="get" onsubmit="return changePwd();">
+							<div class="input-group">
+								<span class="input-group-addon mine-addon2">您的账号</span>
+								<input type="text" id="c_loginid"  class="form-control" name="loginId" placeholder="请输入您的账号" maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon2">原始密码</span>
+								<input type="password" id="c_oldpwd"   class="form-control" name="oldpassword" placeholder="请输入您的原始密码" maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon2">新密码</span>
+								<input type="password" id="c_newpwd"   class="form-control" name="newpassword" placeholder="请输入您的新密码" maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon2">确认密码</span>
+								<input type="password" id="c_renewpwd" class="form-control" placeholder="请确认您的密码" maxlength="20" />
+								<span class="input-group-addon glyphicon glyphicon-minus" flag="1"></span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon2">邮箱</span>
+								<input type="text" id="c_email"    class="form-control" name="email" placeholder="请输入您的邮箱" maxlength="30" />
+								<span id="changePwd_sendEmail" class="input-group-addon changePwd_sendEmail">发送邮件</span>
+							</div>
+							<div class="input-group">
+								<span class="input-group-addon mine-addon2">验证码</span>
+								<input type="text" id="c_code"     class="form-control c_code" name="code" placeholder="请输入验证码" maxlength="4" />
+								<input type="text" id="c_recode"   name="recode" placeholder="系统生成的验证码" value="none" style="display:none;"  />
+							</div>
+							<div class="input-group">
+								<input type="reset"  class="btn btn-primary" value="清空" style="display:none;"/>
+								<input type="submit" id="changePwd_submit"   value="提交" class="btn btn-primary changePwd_submit" />
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
